@@ -1,8 +1,23 @@
 import User from '../models/userModel.js';
-import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
+// import mongoose from 'mongoose';
+
+const createToken = (_id) => {
+  return jwt.sign({ _id }, process.env.SECRET, { expiresIn: '3d' });
+}
 
 export const loginUser = async (req, res) => {
-  res.json({ msg: 'login user' });
+  const { email, password } = req.body;
+  try {
+    const user = await User.login(email, password);
+
+    const token = createToken(user._id);
+
+    res.status(200).json({ email, token });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+  // res.json({ msg: 'login user' });
 }
 
 // signup user
@@ -11,7 +26,9 @@ export const signupUser = async (req, res) => {
   try {
     const user = await User.signup(email, password);
 
-    res.status(200).json({ email, user });
+    const token = createToken(user._id);
+
+    res.status(200).json({ email, token });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
