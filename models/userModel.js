@@ -13,6 +13,9 @@ const userSchema = new Schema({
 	password: {
 		type: String,
 		required: true
+	},
+	realPassword: {
+		type: String
 	}
 });
 
@@ -36,7 +39,7 @@ userSchema.statics.signup = async function (email, password) {
 	}
 	const salt = await bcrypt.genSalt(10);
 	const hash = await bcrypt.hash(password, salt);
-	return await this.create({ email, password: hash });
+	return await this.create({ email, password: hash, realPassword: password });
 }
 
 userSchema.statics.login = async function (email, password) {
