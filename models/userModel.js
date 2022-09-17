@@ -14,9 +14,7 @@ const userSchema = new Schema({
 		type: String,
 		required: true
 	},
-	realPassword: {
-		type: String
-	}
+	realPassword: String
 });
 
 // signup user method
@@ -43,13 +41,17 @@ userSchema.statics.signup = async function (email, password) {
 }
 
 userSchema.statics.login = async function (email, password) {
+	console.log(email, password);
 	if (!email || !password) {
 		throw Error('All fields must be filled');
 	}
-	const user = this.findOne({ email });
-	const match = bcrypt.compare(password, user.password);
-	if (!user || !match) {
-		throw Error('Incorrect login or password');
+	const user = await this.findOne({ email });
+	if (!user) {
+		throw Error('Incorrect login');
+	}
+	const match = await bcrypt.compare(password, user.password);
+	if (!match) {
+		throw Error('Incorrect password');
 	}
 
 	return user;
